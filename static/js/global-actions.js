@@ -433,10 +433,7 @@ function renderStage3(issues) {
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="text-warning mb-0"><i class="bi bi-star-fill"></i> Recommended (1 per repo, no active Copilot PRs)</h6>
                     <div>
-                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="selectAll('.stage3-recommended-checkbox')">Select All</button>
-                        <button class="btn btn-sm btn-outline-warning" onclick="assignRecommended()">
-                            <i class="bi bi-robot"></i> Assign Selected
-                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="selectAll('.stage3-recommended-checkbox')">Select All</button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -595,6 +592,10 @@ function removeAssignedIssues(items) {
         const num = parseInt(issueNumber);
         stage3AllIssues = stage3AllIssues.filter(i => !(i.repo === repo && i.number === num));
         stage3Data = stage3Data.filter(i => !(i.repo === repo && i.number === num));
+        // Add repo to list of repos with Copilot PRs so it's excluded from recommended
+        if (!stage3ReposWithCopilotPRs.includes(repo)) {
+            stage3ReposWithCopilotPRs.push(repo);
+        }
     }
     document.getElementById('stage3-count').textContent = stage3AllIssues.length;
     renderStage3(stage3Data);
