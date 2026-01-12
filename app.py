@@ -12,8 +12,8 @@ import time
 import base64
 import os
 import sys
-from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urlparse
 from services import (
     run_gh_command,
     get_authenticated_user,
