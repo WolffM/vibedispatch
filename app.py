@@ -12,6 +12,7 @@ import time
 import base64
 import os
 import sys
+from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from services import (
     run_gh_command,
@@ -39,6 +40,32 @@ app = Flask(__name__)
 
 # Create blueprint for all routes
 bp = Blueprint('dispatch', __name__)
+
+
+# ============ Template Filters ============
+@app.template_filter('safe_url')
+def safe_url_filter(url):
+    """
+    Sanitize URLs to prevent XSS attacks via javascript: or data: URIs.
+    Only allows http:// and https:// protocols.
+    Returns '#' for invalid URLs.
+    """
+    if not url:
+        return '#'
+    
+    # Parse the URL
+    try:
+        parsed = urlparse(str(url))
+        # Only allow http and https schemes
+        if parsed.scheme in ('http', 'https', ''):
+            # Empty scheme is allowed for relative URLs
+            return url
+        else:
+            # Reject javascript:, data:, and other dangerous schemes
+            return '#'
+    except Exception:
+        # If URL parsing fails, return safe default
+        return '#'
 
 
 # ============ CORS Support ============
