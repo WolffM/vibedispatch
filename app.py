@@ -13,7 +13,6 @@ import base64
 import os
 import sys
 from urllib.parse import urlparse
-from markupsafe import Markup
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from services import (
     run_gh_command,
@@ -57,18 +56,18 @@ def safe_url_filter(url):
     # Parse the URL
     try:
         url_str = str(url)
-        parsed = urlparse(url_str)
         
         # Check for protocol-relative URLs (e.g., //evil.com)
         if url_str.startswith('//'):
             return '#'
         
+        parsed = urlparse(url_str)
+        
         # Only allow http, https schemes, and relative URLs
         if parsed.scheme in ('http', 'https', ''):
-            # Jinja2 auto-escapes template output, but we use Markup
-            # to indicate this is safe HTML. The URL has been validated
-            # to not contain dangerous schemes.
-            return Markup(url_str)
+            # Return as plain string - Jinja2's auto-escaping will handle
+            # HTML special characters appropriately for the href attribute context
+            return url_str
         else:
             # Reject javascript:, data:, and other dangerous schemes
             return '#'
