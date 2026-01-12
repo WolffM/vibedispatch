@@ -47,7 +47,7 @@ bp = Blueprint('dispatch', __name__)
 def safe_url_filter(url):
     """
     Sanitize URLs to prevent XSS attacks via javascript: or data: URIs.
-    Only allows http:// and https:// protocols.
+    Only allows http://, https://, and relative URLs.
     Returns '#' for invalid URLs.
     """
     if not url:
@@ -63,8 +63,8 @@ def safe_url_filter(url):
         else:
             # Reject javascript:, data:, and other dangerous schemes
             return '#'
-    except Exception:
-        # If URL parsing fails, return safe default
+    except (ValueError, AttributeError, TypeError):
+        # If URL parsing fails or url is not string-like, return safe default
         return '#'
 
 
