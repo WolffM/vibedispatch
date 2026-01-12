@@ -13,6 +13,7 @@ import base64
 import os
 import sys
 from urllib.parse import urlparse
+from markupsafe import Markup
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from services import (
     run_gh_command,
@@ -47,7 +48,7 @@ bp = Blueprint('dispatch', __name__)
 def safe_url_filter(url):
     """
     Sanitize URLs to prevent XSS attacks via javascript: or data: URIs.
-    Only allows http://, https://, and relative URLs.
+    Only allows http://, https://, and relative URLs (excluding protocol-relative URLs).
     Returns '#' for invalid URLs.
     """
     if not url:
@@ -55,11 +56,19 @@ def safe_url_filter(url):
     
     # Parse the URL
     try:
-        parsed = urlparse(str(url))
-        # Only allow http and https schemes
+        url_str = str(url)
+        parsed = urlparse(url_str)
+        
+        # Check for protocol-relative URLs (e.g., //evil.com)
+        if url_str.startswith('//'):
+            return '#'
+        
+        # Only allow http, https schemes, and relative URLs
         if parsed.scheme in ('http', 'https', ''):
-            # Empty scheme is allowed for relative URLs
-            return url
+            # Jinja2 auto-escapes template output, but we use Markup
+            # to indicate this is safe HTML. The URL has been validated
+            # to not contain dangerous schemes.
+            return Markup(url_str)
         else:
             # Reject javascript:, data:, and other dangerous schemes
             return '#'
