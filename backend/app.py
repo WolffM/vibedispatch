@@ -40,7 +40,6 @@ except ImportError:
         get_repo_issues,
         get_repo_prs,
         get_workflow_runs,
-        check_vibecheck_installed,
         check_vibecheck_installed_batch,
         clear_vibecheck_cache,
         get_cached,
