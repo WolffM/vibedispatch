@@ -40,7 +40,11 @@ export function Stage3Assign() {
     }
 
     // Sort by created date (oldest first)
-    return filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+      return dateA - dateB
+    })
   }, [allIssues, severityFilter, labelFilter])
 
   // Get recommended issues (1 per repo, no active Copilot PRs)
@@ -54,9 +58,11 @@ export function Stage3Assign() {
       }
     }
     // Sort by created date (oldest first)
-    return Object.values(repoIssues).sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    )
+    return Object.values(repoIssues).sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+      return dateA - dateB
+    })
   }, [filteredIssues, reposWithCopilotPRs])
 
   // Available labels for filter (excluding severity/confidence/vibeCheck)
