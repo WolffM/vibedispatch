@@ -701,7 +701,12 @@ def api_stage4_prs():
     def get_repo_prs_with_info(repo):
         repo_name = repo["name"]
         prs = get_repo_prs(owner, repo_name)
+        result = []
         for pr in prs:
+            # Skip PRs tagged with 'demo'
+            pr_labels = [label.get("name", "").lower() for label in pr.get("labels", [])]
+            if "demo" in pr_labels:
+                continue
             pr["repo"] = repo_name
             # Check if this is a Copilot PR and determine completion status
             author = pr.get("author", {}).get("login", "").lower() if pr.get("author") else ""
@@ -711,7 +716,8 @@ def api_stage4_prs():
                 )
             else:
                 pr["copilotCompleted"] = None  # Not a Copilot PR
-        return prs
+            result.append(pr)
+        return result
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(get_repo_prs_with_info, r) for r in repos[:20]]
