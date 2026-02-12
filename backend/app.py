@@ -488,6 +488,12 @@ def api_cache_stats():
 
 # ============ Stage-based APIs ============
 
+def is_demo_pr(pr):
+    """Check if a PR has the 'demo' label (case-insensitive)."""
+    pr_labels = [label.get("name", "").lower() for label in pr.get("labels", [])]
+    return "demo" in pr_labels
+
+
 @bp.route("/api/stage1-repos", methods=["GET"])
 def api_stage1_repos():
     """Get repos that need vibecheck installed."""
@@ -597,8 +603,7 @@ def api_stage3_issues():
         prs = get_repo_prs(owner, repo_name)
         for pr in prs:
             # Skip PRs tagged with 'demo'
-            pr_labels = [label.get("name", "").lower() for label in pr.get("labels", [])]
-            if "demo" in pr_labels:
+            if is_demo_pr(pr):
                 continue
             author = pr.get("author", {})
             if author and "copilot" in author.get("login", "").lower():
@@ -704,8 +709,7 @@ def api_stage4_prs():
         result = []
         for pr in prs:
             # Skip PRs tagged with 'demo'
-            pr_labels = [label.get("name", "").lower() for label in pr.get("labels", [])]
-            if "demo" in pr_labels:
+            if is_demo_pr(pr):
                 continue
             pr["repo"] = repo_name
             # Check if this is a Copilot PR and determine completion status

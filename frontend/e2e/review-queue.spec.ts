@@ -224,8 +224,8 @@ test.describe('Review Queue Empty State', () => {
     // Wait for view to render
     await expect(page.locator('.review-queue-view')).toBeVisible()
 
-    // Should show the review carousel (since we have 1 non-demo PR)
-    await expect(page.locator('.review-carousel-header').or(page.locator('.review-carousel-empty')).first())
+    // Should show the review carousel header (since we have 1 non-demo PR ready for review)
+    await expect(page.locator('.review-carousel-header'))
       .toBeVisible({ timeout: 10000 })
 
     // The Review Queue badge should show count of 1 (only non-demo PR)
