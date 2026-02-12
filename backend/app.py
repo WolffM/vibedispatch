@@ -706,7 +706,7 @@ def api_stage4_prs():
     def get_repo_prs_with_info(repo):
         repo_name = repo["name"]
         prs = get_repo_prs(owner, repo_name)
-        result = []
+        filtered_prs = []
         for pr in prs:
             # Skip PRs tagged with 'demo'
             if is_demo_pr(pr):
@@ -720,8 +720,8 @@ def api_stage4_prs():
                 )
             else:
                 pr["copilotCompleted"] = None  # Not a Copilot PR
-            result.append(pr)
-        return result
+            filtered_prs.append(pr)
+        return filtered_prs
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(get_repo_prs_with_info, r) for r in repos[:20]]
